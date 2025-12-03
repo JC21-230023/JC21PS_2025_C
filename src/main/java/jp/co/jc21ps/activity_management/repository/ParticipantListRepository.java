@@ -21,7 +21,23 @@ public class ParticipantListRepository {
          * TODO ➊ 初期表示情報を取得するSQLを完成させる。
          */
         String sql = """
-
+                SELECT
+                 trn_participant.user_id,
+                 mst_club.activity_id,
+                 mst_club.activity_name,
+                 mst_user.user_name
+                FROM
+                 trn_activity
+                Inner JOIN
+                 trn_participant
+                ON
+                 trn_activity.activity_id = trn_partipant_activity_id
+                Inner JOIN
+                mst_user
+                ON
+                  mst_user.user_id = trn_partipant_user_id
+                WHERE
+                trn_activity.activity_id = ?
                 """;
 
         List<Map<String, Object>> participantList = jdbcTemplate.queryForList(sql,
@@ -56,7 +72,12 @@ public class ParticipantListRepository {
          * TODO ➋ 活動名を取得するSQLを完成させる。
          */
         String sql = """
-
+                SELECT
+                mst_club.activity_name
+                FROM
+                trn_activity
+                WHERE
+                trn_activity.activity_id = activity_id
                 """;
 
         List<Map<String, Object>> actNameList = jdbcTemplate.queryForList(sql, paramEntity.getActivityId());
