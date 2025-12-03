@@ -13,6 +13,7 @@ import jp.co.jc21ps.activity_management.service.CommonService;
 import jp.co.jc21ps.activity_management.service.ParticipantListService;
 import jp.co.jc21ps.activity_management.dto.ParticipantDto;
 import jp.co.jc21ps.activity_management.dto.SessionDto;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import jakarta.servlet.http.HttpSession;
@@ -47,19 +48,29 @@ public class ParticipantListController {
         /*
          * TODO ➊ セッションからuserId, clubIdを取得
          */
+        // セッションからclubIdを取得
+        SessionDto sessionDto = commonService.getSessionDto(session);
+        String leaderClubId = sessionDto.getClubId();
+        String leaderUserId = sessionDto.getUserId();
 
         // セッションが切れた場合、エラー画面に遷移
-//         if (userId.isEmpty()) {
-//             mav.setViewName("error");
-//             return mav;
-//         }
+        if (leaderClubId.isEmpty()) {
+            mav.setViewName("error");
+            return mav;
+        }
+        if (leaderUserId.isEmpty()) {
+            mav.setViewName("error");
+            return mav;
+        }
 
-        /*
-         * ➋TODO dtoに値をセット
-         */
+        // ➋TODO dtoに値をセット
+        ParticipantListDto activityDto = new ParticipantListDto();
+        activityDto.setUserId(leaderUserId);
+        activityDto.setActivityId(activityId);
 
         try {
             // ➌TODO participantListServiceのgetParticipantListDataメソッドを呼び出す。
+            ParticipantDto participantDto = participantListService.getParticipantListData(activityDto);
 
             // 返却用のリスト
             List<ParticipantListForm> responseListForm = new ArrayList<>();
@@ -67,15 +78,31 @@ public class ParticipantListController {
             /*
              * ➍ TODO responseListFormに値をセット
              */
-
+            if (participantDto != null && participantDto.getPariticipantListDto() != null) {
+                for (ParticipantListDto dto : participantDto.getPariticipantListDto()) {
+                    ParticipantListForm form = new ParticipantListForm();
+                    form.setActivityId(dto.getActivityId());
+                    form.setUserId(dto.getUserId());
+                    form.setActivityName(dto.getActivityName());
+                    form.setUserName(dto.getUserName());
+                    responseListForm.add(form);
+                }
+            }
+            
             /*
              * ➎ TODO 取得したデータを画面側に渡す。
              */
+            mav.addObject("participantList", responseListForm);
+            if (participantDto != null && participantDto.getActivityName() != null) {
+                mav.addObject("activityName", participantDto.getActivityName());
+            }
 
             // messages.propertiesからメッセージを取得
             String resultMessage = messageSource.getMessage("notpariticipant", null, Locale.getDefault());
             mav.addObject("message", resultMessage);
-//             mav.addObject("leaderClubId", leaderClubId);
+
+            // ヘッダー情報のclubIdに、セッションから取得したclubIdを設定する
+            mav.addObject("leaderClubId", leaderClubId);
 
             // 遷移先の設定
             mav.setViewName("participantList");

@@ -98,6 +98,7 @@ public class RegisterActivityController {
             return mav;
         }
 
+
         try {
             // インスタンス化
             RegisterActivitySaveDto activitySaveDto = new RegisterActivitySaveDto();
