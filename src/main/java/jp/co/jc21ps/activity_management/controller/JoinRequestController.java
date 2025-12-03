@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -82,7 +83,16 @@ public class JoinRequestController {
         /*
          * TODO ➊ 初期表示情報取得結果に応じて、以下の条件文を完成させる。
          */
-
+        if (ObjectUtils.isEmpty(responseForm)) {
+            // レスポンスが存在しない場合
+            String notRequestClubMessage = messageSource.getMessage("notRequestClubMessage", null, Locale.getDefault());
+            mav.addObject("notRequestClubMessage", notRequestClubMessage);
+        } else {
+            // それ以外(=レスポンスが存在する場合)
+            mav.addObject("joinRequestSaveForm", responseForm);
+        }
+        // formから取得したメッセージをオブジェクトに追加する
+        mav.addObject("joinRequestCompleteMessage", paramForm.getMessage());
         mav.addObject("leaderClubId", leaderClubId);
 
         // 部員登録申請画面に遷移
@@ -118,6 +128,15 @@ public class JoinRequestController {
             /*
              * TODO ➋ インサートの成功、失敗に応じて、処理を変更する。
              */
+            if (result) {
+                // 登録戻り値がTrueの場合
+                String joinRequestCompleteMessage = messageSource.getMessage("joinRequestCompleteMessage", null, Locale.getDefault());
+                redirectAttributes.addFlashAttribute("joinOkMessage", joinRequestCompleteMessage);
+                mav.setViewName("redirect:/joinRequest");
+            } else {
+                // それ以外
+                mav.setViewName("error");
+            }
 
         } catch (Exception e) {
             mav.setViewName("error");
