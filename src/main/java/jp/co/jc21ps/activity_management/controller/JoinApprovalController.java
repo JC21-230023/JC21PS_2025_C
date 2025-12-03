@@ -37,7 +37,7 @@ public class JoinApprovalController {
 
     @GetMapping
     public ModelAndView getjoinApproval(HttpSession session) {
-
+        System.out.println("getMeth");
         ModelAndView mav = new ModelAndView();
 
         // セッションからuserId,clubIdを取得
@@ -50,10 +50,11 @@ public class JoinApprovalController {
             mav.setViewName("error");
             return mav;
         }
-
+        System.out.println("try前");
         try {
             // セッションが切れた場合、エラー画面に遷移する
             if (userId.isEmpty()) {
+                
                 mav.setViewName("error");
                 return mav;
             }
@@ -92,6 +93,7 @@ public class JoinApprovalController {
             mav.setViewName("JoinApproval");
 
         } catch (Exception e) {
+            e.printStackTrace();
             mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("error");
         }
@@ -101,7 +103,7 @@ public class JoinApprovalController {
     // 否認
     @PostMapping("/denial")
     public ModelAndView denialRequest(JoinApprovalDataForm paramForm, HttpSession session) {
-
+        System.out.println("課題のところ");
         // paramDtoに値をセット
         JoinApprovalDataDto paramDto = new JoinApprovalDataDto();
         paramDto.setUserId(paramForm.getUserId());
@@ -121,10 +123,12 @@ public class JoinApprovalController {
         }
 
         try {
+
             // サービスからdeleteメソッドを呼び出す
             /*
              * TODO ➊ ユーザーを否認する際の処理を完成させる。
              */
+            joinApprovalService.deleteRequestInfo(paramDto);
 
             // deleteに成功した場合、部員登録承認画面に遷移
             mav.addObject("leaderClubId", leaderClubId);
@@ -164,7 +168,9 @@ public class JoinApprovalController {
             /*
              * TODO ➋ ユーザーを承認する際の処理を完成させる。
              */
-
+            joinApprovalService.insertRequestInfo(paramDto);
+            joinApprovalService.deleteRequestInfo(paramDto);
+            
             // insert, deleteに成功した場合、部員登録承認画面に遷移
             mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("redirect:/joinApproval");
