@@ -22,7 +22,23 @@ public class JoinRequestRepository {
          * TODO ➊ 初期表示情報を取得するSQLを完成させる。
          */
         String sql = """
-
+                SELECT
+                    mst_club.*
+                FROM
+                    mst_club
+                WHERE
+                    NOT EXISTS (
+                        SELECT 1
+                        FROM trn_join_request
+                        WHERE trn_join_request.club_id = mst_club.club_id
+                        AND trn_join_request.user_id = ?
+                    )
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM trn_club_member
+                        WHERE trn_club_member.club_id = mst_club.club_id
+                        AND trn_club_member.user_id = ?
+                    )
                 """;
 
         List<JoinRequestEntity> responseEntity = new ArrayList<>();
@@ -54,7 +70,11 @@ public class JoinRequestRepository {
          * TODO ➋ 申請者の情報をインサートするSQLを完成させる。
          */
         String sql = """
-
+                INSERT INTO
+                    trn_join_request
+                    (user_id,
+                     club_id)
+                VALUES (?,?)
                 """;
 
         // entityから値をゲットする
