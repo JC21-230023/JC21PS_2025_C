@@ -170,7 +170,7 @@ public class JoinApprovalController {
              */
             joinApprovalService.insertRequestInfo(paramDto);
             joinApprovalService.deleteRequestInfo(paramDto);
-            leaderClubId=commonService.getSessionDto(session).getClubId();
+            
             // insert, deleteに成功した場合、部員登録承認画面に遷移
             mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("redirect:/joinApproval");

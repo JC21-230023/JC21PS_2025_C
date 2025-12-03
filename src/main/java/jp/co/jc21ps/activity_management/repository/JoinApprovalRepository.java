@@ -112,7 +112,9 @@ public class JoinApprovalRepository {
 
         // entityから値をゲット
         Object[] paramList = {
-                paramEntity.getUserId()
+                paramEntity.getUserId(),
+                paramEntity.getClubId(),
+                paramEntity.isLeaderFlg()
         };
 
         jdbcTemplate.update(sqlInsert, paramList);
