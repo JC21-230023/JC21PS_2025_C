@@ -78,30 +78,40 @@ public class RegisterActivityController {
         ModelAndView mav = new ModelAndView();
 
         /*
-         * TODO ➊ セッションからuserIdを取得する
+         * TODO ➊ セッションからclubIdを取得する
          */
+        SessionDto sessionDto = commonService.getSessionDto(session);
+        String leaderClubId = sessionDto.getClubId();
+        
 
         // バリデーションエラー
         if (bindingResult.hasErrors()) {
             mav.addObject("registerActivitySaveForm", paramForm);
-            // mav.addObject("leaderClubId", leaderClubId);
+            mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("registerActivity");
             return mav;
         }
 
         // セッションが切れた場合、エラー画面に遷移
-        // if (leaderClubId.isEmpty()) {
-        //     mav.setViewName("error");
-        //     return mav;
-        // }
+        if (leaderClubId.isEmpty()) {
+            mav.setViewName("error");
+            return mav;
+        }
+
 
         try {
             // インスタンス化
             RegisterActivitySaveDto activitySaveDto = new RegisterActivitySaveDto();
 
-            /*
-             * TODO ➋ activitySaveDtoに、パラメータをsetする。
-             */
+            // activitySaveDtoに、パラメータをsetする
+            activitySaveDto.setActivityDate(paramForm.getActivityDate());
+            activitySaveDto.setActivityName(paramForm.getActivityName());
+            activitySaveDto.setClubId(leaderClubId);
+            activitySaveDto.setActivityStartTime(paramForm.getActivityStartTime());
+            activitySaveDto.setActivityEndTime(paramForm.getActivityEndTime());
+            activitySaveDto.setActivityPlace(paramForm.getActivityPlace());
+            activitySaveDto.setMaxParticipant(paramForm.getMaxParticipant());
+            activitySaveDto.setActivityDescription(paramForm.getActivityDescription());
 
             // サービスからinsertメソッドを呼び出す
             String resultMessageKey = registerActivityService.insertActivity(activitySaveDto);
@@ -113,7 +123,7 @@ public class RegisterActivityController {
             // 活動登録に成功した場合、トップ画面に遷移
             if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
                 redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
-                // mav.addObject("leaderClubId", leaderClubId);
+                mav.addObject("leaderClubId", leaderClubId);
                 mav.setViewName("redirect:/top");
                 return mav;
 

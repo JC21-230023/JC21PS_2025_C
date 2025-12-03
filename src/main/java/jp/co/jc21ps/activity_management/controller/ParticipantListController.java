@@ -100,6 +100,7 @@ public class ParticipantListController {
             // messages.propertiesからメッセージを取得
             String resultMessage = messageSource.getMessage("notpariticipant", null, Locale.getDefault());
             mav.addObject("message", resultMessage);
+
             // ヘッダー情報のclubIdに、セッションから取得したclubIdを設定する
             mav.addObject("leaderClubId", leaderClubId);
 
